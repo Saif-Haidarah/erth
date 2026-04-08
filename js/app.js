@@ -74,11 +74,12 @@ function toggleLang() {
   }); 
 }
 
+// ✅ أضف هذا (الصور المحلية)
 const images = {
-  shell: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1400',
-  core: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1400',
-  turbine: 'https://images.unsplash.com/photo-1517030330234-94c4fa948ebc?q=80&w=1400',
-  caps: 'https://images.unsplash.com/photo-1558444479-c84851830622?q=80&w=1400'
+  shell: './assets/shell.jpg',
+  core: './assets/core.jpg',
+  turbine: './assets/turbine.jpg',
+  caps: './assets/caps.jpg'
 };
 
 const engine = document.getElementById('v-engine');
