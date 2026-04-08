@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="Saif Ahmed">
+<title>ERTH | Sovereign Hypercar Master Specification</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600&family=Tajawal:wght@200;400;500&family=Montserrat:wght@100;300;400&display=swap" rel="stylesheet">
+<style>
+:root { --obsidian: #050505; --deep: #0a0a0a; --surface: #111; --gold: #c9a96e; --gold-dim: #7a6340; --text: #ede9e0; --text-dim: #888; }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-font-smoothing: antialiased; }
+body { background: var(--obsidian); color: var(--text); font-family: 'Tajawal', sans-serif; overflow-x: hidden; scroll-behavior: smooth; }
+[dir="ltr"] body { font-family: 'Montserrat', sans-serif; }
+
+/* Navigation & UI */
+.lang-switch { position:fixed; top:30px; left:40px; z-index:9999; cursor:pointer; }
+[dir="ltr"] .lang-switch { left:auto; right:40px; }
+.tear-drop { width:38px; height:58px; background:rgba(201,169,110,0.1); border:1px solid var(--gold-dim); border-radius:0 0 20px 20px; display:flex; align-items:center; justify-content:center; transition:0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+.tear-drop:hover { background:var(--gold); transform: translateY(4px); }
+.lang-label { position:absolute; font-family:'Cormorant Garamond', serif; font-size:24px; color:var(--gold); font-weight: 300; }
+
+.container { max-width:1100px; margin:0 auto; padding:0 30px; }
+section { padding:80px 0; border-bottom: 1px solid #151515; }
+.s-num { font-size:10px; color:var(--gold-dim); letter-spacing:6px; margin-bottom:12px; display: flex; align-items: center; gap: 15px; text-transform: uppercase; }
+.s-num::after { content: ''; height: 1px; width: 40px; background: var(--gold-dim); }
+.s-title { font-family:'Cormorant Garamond', serif; font-size:clamp(35px, 6vw, 65px); font-weight:300; margin-bottom:30px; letter-spacing: -1px; }
+
+/* Energy Flow Diagram */
+.energy-flow { display:flex; align-items:center; justify-content:center; gap:15px; margin:40px 0; flex-wrap:wrap; font-size:10px; letter-spacing:2px; }
+.flow-node { border:1px solid var(--gold-dim); padding:10px 15px; background:var(--surface); color:var(--gold); text-transform:uppercase; }
+.flow-arrow { color:var(--gold-dim); font-size:16px; }
+
+/* Engineering Grid */
+.tech-master-grid { display:grid; grid-template-columns: 1fr 1fr; gap:50px; margin-top:40px; }
+@media (max-width: 800px) { .tech-master-grid { grid-template-columns: 1fr; } }
+.tech-box { background:var(--deep); padding:30px; border-left:3px solid var(--gold-dim); }
+[dir="ltr"] .tech-box { border-left:none; border-right:3px solid var(--gold-dim); }
+.tech-box h4 { font-family:'Cormorant Garamond', serif; color:var(--gold); font-size:24px; margin-bottom:15px; }
+.tech-box ul { list-style:none; }
+.tech-box li { color:var(--text-dim); font-size:14px; margin-bottom:10px; line-height:1.6; }
+.tech-box b { color:var(--text); font-weight:500; }
+
+/* Specification Table */
+.specs-table { width:100%; border-collapse:collapse; margin-top:20px; }
+.specs-table td { padding:15px 0; border-bottom:1px solid #222; font-size:13px; }
+.specs-table .val { text-align:right; font-family:'Cormorant Garamond', serif; color:var(--gold); font-size:20px; }
+[dir="ltr"] .specs-table .val { text-align:left; }
+
+/* Dissection Area */
+.visual-engine { height:500px; background:var(--surface); border:1px solid #222; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; background-size:cover; background-position:center; transition: 0.8s ease-in-out, transform 0.1s; }
+.dissection-ui { position:absolute; inset:0; z-index:20; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.6); opacity:0; pointer-events:none; transition: 0.6s; }
+.dissection-ui.active { opacity:1; pointer-events:all; }
+.part-btn { background:rgba(8,8,8,0.95); border:1px solid var(--gold-dim); padding:30px 40px; cursor:pointer; color:var(--gold); font-size:10px; letter-spacing:2px; text-transform:uppercase; }
+.engine-nav { position:absolute; bottom:20px; width:100%; padding:0 30px; display:flex; justify-content:space-between; z-index:30; }
+.btn-eng { background:rgba(5,5,5,0.9); border:1px solid var(--gold-dim); color:var(--gold); padding:10px 20px; cursor:pointer; font-size:9px; letter-spacing:2px; display:none; }
+
+#toast { position: fixed; bottom: -60px; left: 50%; transform: translateX(-50%); background: var(--gold); color: var(--obsidian); padding: 12px 30px; font-size: 12px; font-weight: 600; transition: 0.5s; z-index: 10000; opacity:0; }
+#toast.show { bottom: 30px; opacity: 1; }
+</style>
+</head>
+<body>
+
+<div id="toast">COPIED</div>
+
+<div class="lang-switch" onclick="toggleLang()">
+  <div class="tear-drop"><span class="lang-label lang-ar-label" id="l-ar">ع</span><span class="lang-label lang-en-label" id="l-en" style="opacity:0">E</span></div>
+</div>
+
+<div class="container">
+  <section style="text-align:center; padding-top:120px; border:none;">
+    <div class="s-num">PROJECT ERTH · TECHNICAL DATA</div>
+    <h1 class="s-title" data-en="ERTH: The Master Manifesto">أرث: المانيفستو التقني</h1>
+    <div class="energy-flow">
+      <div class="flow-node" data-en="MICRO-TURBINE">توربين نفاذ</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" data-en="GENERATOR">مولد</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" data-en="CAPACITORS">مكثفات غرافين</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" data-en="4x MOTORS">4 محركات محورية</div>
+    </div>
+  </section>
+
+  <section id="dissection-sec">
+    <div class="s-num">01 · ARCHITECTURAL LAYERS</div>
+    <h2 class="s-title" data-en="Engineering Visuals">المعاينة الهندسية</h2>
+    <div class="visual-engine" id="v-engine" style="background-image: url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1400'); cursor:pointer;" onclick="startDissection()">
+      <div id="hint" style="color:var(--gold); font-size:10px; letter-spacing:4px; animation: pulse 2s infinite; text-align:center; background:rgba(0,0,0,0.6); padding:15px; border:1px solid var(--gold-dim);" data-en="CLICK TO DISSECT">انقر للتفكيك</div>
+      <div id="ui-overlay" class="dissection-ui">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+          <div class="part-btn" onclick="drillTo('turbine', event)" data-en="TURBINE CORE">قلب التوربين</div>
+          <div class="part-btn" onclick="drillTo('caps', event)" data-en="ENERGY BANK">مخزن الطاقة</div>
+        </div>
+      </div>
+      <div class="engine-nav">
+        <button id="btn-back" class="btn-eng" onclick="goBack(event)" data-en="BACK">عودة</button>
+        <button id="btn-reset" class="btn-eng" onclick="resetAll(event)" data-en="REASSEMBLE">إعادة تجميع</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="s-num">02 · FULL SPECIFICATION</div>
+    <h2 class="s-title" data-en="Performance Matrix">مصفوفة الأداء</h2>
+    <div class="tech-master-grid">
+      <div class="tech-box">
+        <h4 data-en="Power System">منظومة القوة</h4>
+        <ul>
+          <li data-en="<b>Primary Gen:</b> Micro-Turbine (Inconel 718)"><b>المولد:</b> توربين غازي (Inconel 718)</li>
+          <li data-en="<b>Energy Matrix:</b> Graphene Capacitors"><b>التخزين:</b> مكثفات غرافين فائقة</li>
+          <li data-en="<b>Cooling:</b> Ceramic Heat Exchanger"><b>التبريد:</b> مبدل حراري سيراميكي</li>
+          <li data-en="<b>Fuel:</b> 75L Multi-fuel System"><b>الوقود:</b> نظام وقود حيوي 75 لتر</li>
+        </ul>
+      </div>
+      <div class="tech-box">
+        <h4 data-en="The Chassis">الهيكل الميكانيكي</h4>
+        <ul>
+          <li data-en="<b>Structure:</b> Graphene-Carbon Monocoque"><b>البناء:</b> أحادي من الكاربون والغرافين</li>
+          <li data-en="<b>Dynamics:</b> Power-to-Weight 1.61 KG/HP"><b>الديناميكا:</b> 1.61 كجم لكل حصان</li>
+          <li data-en="<b>Safety:</b> Automatic Fire Suppression"><b>الأمان:</b> إخماد حريق CO2 آلي</li>
+          <li data-en="<b>Suspension:</b> Active Maglev Struts"><b>التعليق:</b> مساعدات مغناطيسية نشطة</li>
+        </ul>
+      </div>
+    </div>
+
+    <table class="specs-table">
+      <tr><td data-en="0-100 KM/H">التسارع 0-100 كم/س</td><td class="val">1.9 SEC</td></tr>
+      <tr><td data-en="0-200 KM/H">التسارع 0-200 كم/س</td><td class="val">5.8 SEC</td></tr>
+      <tr><td data-en="MAX RANGE">المدى الأقصى</td><td class="val">850 KM</td></tr>
+      <tr><td data-en="TOTAL OUTPUT">القوة الإجمالية</td><td class="val">900 HP</td></tr>
+      <tr><td data-en="STATUS">حالة الامتلاك</td><td class="val" data-en="AVAILABLE UPON REQUEST">متاح عند الطلب</td></tr>
+    </table>
+  </section>
+</div>
+
+<footer style="padding: 60px 0; text-align: center; color: var(--gold-dim); font-size: 9px; letter-spacing: 4px; text-transform: uppercase;">
+  ERTH MASTER BUILD · BY SAIF AHMED · 2026
+</footer>
+
+<script>
+let curL = 'ar'; let curLayer = 'shell';
+let audioCtx;
+function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); }
+function haptic() { initAudio(); const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(150, audioCtx.currentTime); gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.2); document.getElementById('v-engine').style.transform = 'scale(0.99)'; setTimeout(() => { document.getElementById('v-engine').style.transform = 'scale(1)'; }, 100); }
+
+function toggleLang() { 
+  curL = curL === 'ar' ? 'en' : 'ar'; 
+  document.documentElement.dir = curL === 'ar' ? 'rtl' : 'ltr'; 
+  document.getElementById('l-ar').style.opacity = curL === 'ar' ? 1 : 0;
+  document.getElementById('l-en').style.opacity = curL === 'en' ? 1 : 0;
+  document.querySelectorAll('[data-en]').forEach(el => { let tmp = el.innerHTML; el.innerHTML = el.getAttribute('data-en'); el.setAttribute('data-en', tmp); }); 
+}
+
+function startDissection() { if (curLayer === 'shell') { haptic(); curLayer = 'core'; document.getElementById('v-engine').style.backgroundImage = "url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1400')"; document.getElementById('ui-overlay').classList.add('active'); document.getElementById('hint').style.display = 'none'; document.getElementById('btn-reset').style.display = 'block'; } }
+function drillTo(part, e) { e.stopPropagation(); haptic(); curLayer = part; document.getElementById('ui-overlay').classList.remove('active'); const imgs = { turbine: 'https://images.unsplash.com/photo-1517030330234-94c4fa948ebc?q=80&w=1400', caps: 'https://images.unsplash.com/photo-1558444479-c84851830622?q=80&w=1400' }; document.getElementById('v-engine').style.backgroundImage = `url('${imgs[part]}')`; document.getElementById('btn-back').style.display = 'block'; }
+function goBack(e) { e.stopPropagation(); haptic(); curLayer = 'core'; document.getElementById('v-engine').style.backgroundImage = "url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1400')"; document.getElementById('ui-overlay').classList.add('active'); document.getElementById('btn-back').style.display = 'none'; }
+function resetAll(e) { e.stopPropagation(); haptic(); curLayer = 'shell'; document.getElementById('v-engine').style.backgroundImage = "url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1400')"; document.getElementById('ui-overlay').classList.remove('active'); document.getElementById('btn-reset').style.display = 'none'; document.getElementById('btn-back').style.display = 'none'; document.getElementById('hint').style.display = 'block'; }
+</script>
+</body>
+</html>
