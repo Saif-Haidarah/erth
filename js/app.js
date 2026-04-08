@@ -17,11 +17,8 @@ class SoundEngine {
   }
   
   setupLayers() {
-    // طبقة الخلفية (Idle / همسة كهربائية)
     this.layers.idle = this._createOsc(45, 'sine', 0.04);
-    // طبقة التوربين (تتغير حسب الحالة)
     this.layers.turbine = this._createOsc(120, 'triangle', 0.0);
-    // مرشح نغمي (Harmonics Filter)
     this.layers.harmonics = this.ctx.createBiquadFilter();
     this.layers.harmonics.type = 'bandpass';
     this.layers.harmonics.frequency.value = 800;
@@ -47,7 +44,8 @@ class SoundEngine {
   setState(state) {
     if (!this.isInit) return;
     const now = this.ctx.currentTime;
-    const set = (node, val, t=0.2) => node.gain.setTargetAtTime(val, now, t);
+    // ✅ التصحيح: الوصول إلى AudioParam عبر .gain.gain
+    const set = (node, val, t=0.2) => node.gain.gain.setTargetAtTime(val, now, t);
     const freq = (node, val, t=0.2) => node.osc.frequency.setTargetAtTime(val, now, t);
 
     switch(state) {
@@ -73,13 +71,11 @@ class SoundEngine {
   }
 }
 
-// تهيئة المحرك الصوتي
 const audio = new SoundEngine();
 let curL = 'ar'; 
 let curLayer = 'shell';
 let toastTimer;
 
-// 🔔 إشعار ذكي يختفي تلقائياً
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; 
@@ -88,7 +84,6 @@ function showToast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// 🌐 تبديل اللغة الآمن
 function toggleLang() {
   audio.init();
   audio.setState(curL === 'ar' ? 'detail' : 'core');
@@ -103,7 +98,6 @@ function toggleLang() {
   }); 
 }
 
-// 🖼️ مسارات الصور المحلية
 const images = {
   shell: './assets/shell.jpg',
   core: './assets/core.jpg',
@@ -111,7 +105,6 @@ const images = {
   caps: './assets/caps.jpg'
 };
 
-// العناصر DOM
 const engine = document.getElementById('v-engine');
 const overlay = document.getElementById('ui-overlay');
 const hint = document.getElementById('hint');
@@ -119,7 +112,6 @@ const btnBack = document.getElementById('btn-back');
 const btnReset = document.getElementById('btn-reset');
 const loader = document.getElementById('loader');
 
-// 📥 تحميل الصور مع حالة تحميل
 function loadImg(src, cb) {
   loader.classList.add('active');
   const img = new Image();
@@ -130,12 +122,11 @@ function loadImg(src, cb) {
   };
   img.onerror = () => { 
     loader.classList.remove('active'); 
-    showToast('فشل تحميل الصورة'); 
+    showToast('فشل تحميل الصورة - تحقق من المسار'); 
   };
   img.src = src;
 }
 
-// 🛠️ دوال التفاعل مع الصوت
 function startDissection() {
   if (curLayer === 'shell') {
     audio.init(); 
@@ -177,7 +168,6 @@ function resetAll() {
   });
 }
 
-// ⌨️ تهيئة الأحداث وإمكانية الوصول
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('langToggle').addEventListener('click', toggleLang);
   engine.addEventListener('click', startDissection);
@@ -199,7 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
     resetAll(); 
   });
 
-  // دعم لوحة المفاتيح
   document.querySelectorAll('[tabindex="0"]').forEach(el => {
     el.addEventListener('keydown', e => { 
       if(e.key === 'Enter' || e.key === ' ') el.click(); 
