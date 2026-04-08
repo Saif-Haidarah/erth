@@ -60,3 +60,10 @@ section { padding:80px 0; border-bottom: 1px solid #151515; }
 @keyframes pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
 
 footer { padding: 60px 0; text-align: center; color: var(--gold-dim); font-size: 9px; letter-spacing: 4px; text-transform: uppercase; }
+
+.visual-engine {
+  background-size: cover;
+  background-position: center;
+  /* تحسين التحميل */
+  image-rendering: -webkit-optimize-contrast;
+}
