@@ -435,39 +435,31 @@
 </div>
 
 <script>
-// ── CURSOR ──
+// ── 1. CORE VARIABLES & DOM ELEMENTS ──
 const cur = document.getElementById('cur');
 const ring = document.getElementById('cur-ring');
+const muteBtn = document.getElementById('muteToggle');
+const iconSound = document.getElementById('icon-sound');
+const iconMute = document.getElementById('icon-mute');
+const modal = document.getElementById('inquiryModal');
+
 let mx = 0, my = 0, rx = 0, ry = 0;
+let isMuted = false;
 
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  cur.style.left = mx + 'px'; cur.style.top = my + 'px';
-});
-(function animateCursor(){
-  rx += (mx - rx) * 0.12;
-  ry += (my - ry) * 0.12;
-  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
-  requestAnimationFrame(animateCursor);
-})();
-
-document.querySelectorAll('.stat-box,.tech-box,.reality-card,.nb-item,.part-btn,.p-tab,.shot-copy').forEach(el => {
-  el.addEventListener('mouseenter', () => { ring.style.width = '44px'; ring.style.height = '44px'; });
-  el.addEventListener('mouseleave', () => { ring.style.width = '28px'; ring.style.height = '28px'; });
-});
-
-// ── REVEAL ──
-const obs = new IntersectionObserver(entries => {
-  entries.forEach((entry, i) => {
-    if (entry.isIntersecting) {
-      setTimeout(() => entry.target.classList.add('on'), i * 55);
-      obs.unobserve(entry.target);
-    }
+// ── 2. CUSTOM CURSOR ──
+if (window.innerWidth > 800) {
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cur.style.left = mx + 'px'; cur.style.top = my + 'px';
   });
-}, { threshold: 0.08 });
-document.querySelectorAll('.rv').forEach(el => obs.observe(el));
+  (function animate() {
+    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animate);
+  })();
+}
 
-// ── SOUND ENGINE (Fixed & Layered) ──
+// ── 3. AUDIO ENGINE (SAFE & MUTABLE) ──
 class SoundEngine {
   constructor() {
     this.ctx = null;
@@ -476,12 +468,14 @@ class SoundEngine {
   }
   init() {
     if (this.isInit) return;
-    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-    this.isInit = true;
-    this.setupLayers();
+    try {
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      this.isInit = true;
+      this.setupLayers();
+    } catch (e) { console.warn("Audio blocked"); }
   }
   setupLayers() {
-    this.layers.idle = this._createOsc(45, 'sine', 0.04);
+    this.layers.idle = this._createOsc(45, 'sine', 0.03);
     this.layers.turbine = this._createOsc(120, 'triangle', 0.0);
     this.layers.harmonics = this.ctx.createBiquadFilter();
     this.layers.harmonics.type = 'bandpass';
@@ -501,45 +495,65 @@ class SoundEngine {
     return { osc, gain: g };
   }
   setState(state) {
-    if (!this.isInit) return;
+    if (!this.isInit || isMuted) return;
     const now = this.ctx.currentTime;
     const set = (node, val, t = 0.2) => node.gain.gain.setTargetAtTime(val, now, t);
     const freq = (node, val, t = 0.2) => node.osc.frequency.setTargetAtTime(val, now, t);
     switch(state) {
-      case 'idle': set(this.layers.idle, 0.04); set(this.layers.turbine, 0.0); break;
-      case 'core': set(this.layers.idle, 0.06, 0.3); set(this.layers.turbine, 0.08, 0.4); freq(this.layers.turbine, 220, 0.4); break;
-      case 'detail': set(this.layers.idle, 0.03, 0.1); set(this.layers.turbine, 0.14, 0.2); freq(this.layers.turbine, 480, 0.2); break;
-      case 'stealth': set(this.layers.idle, 0.01); set(this.layers.turbine, 0.0); break;
+      case 'idle': set(this.layers.idle, 0.03); set(this.layers.turbine, 0.0); break;
+      case 'core': set(this.layers.idle, 0.05, 0.3); set(this.layers.turbine, 0.06, 0.4); freq(this.layers.turbine, 220, 0.4); break;
+      case 'detail': set(this.layers.idle, 0.02, 0.1); set(this.layers.turbine, 0.1, 0.2); freq(this.layers.turbine, 480, 0.2); break;
     }
+  }
+  toggleMute() {
+    if (!this.isInit) return;
+    isMuted = !isMuted;
+    const vol = isMuted ? 0 : 1; // Simple mute logic for demo
+    this.layers.idle.gain.gain.value = isMuted ? 0 : 0.03;
+    this.layers.turbine.gain.gain.value = isMuted ? 0 : 0.0;
+    
+    iconSound.style.display = isMuted ? 'none' : 'block';
+    iconMute.style.display = isMuted ? 'block' : 'none';
   }
 }
 const audio = new SoundEngine();
 
-// ── HAPTIC FEEDBACK ──
+// ── 4. UI INTERACTIONS ──
 function haptic() {
   audio.init();
+  if (isMuted) return;
   const osc = audio.ctx.createOscillator();
   const gain = audio.ctx.createGain();
   osc.type = 'sine';
   osc.frequency.setValueAtTime(150, audio.ctx.currentTime);
   gain.gain.setValueAtTime(0.08, audio.ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.01, audio.ctx.currentTime + 0.2);
+  gain.gain.exponentialRampToValueAtTime(0.01, audio.ctx.currentTime + 0.15);
   osc.connect(gain); gain.connect(audio.ctx.destination);
-  osc.start(); osc.stop(audio.ctx.currentTime + 0.2);
-  document.getElementById('v-engine').style.transform = 'scale(0.99)';
-  setTimeout(() => { document.getElementById('v-engine').style.transform = 'scale(1)'; }, 100);
+  osc.start(); osc.stop(audio.ctx.currentTime + 0.15);
 }
 
-// ── TOAST ──
-let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
-}
+// Scroll Reveal Animation
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('active');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.rv, .stats-strip, .tech-box, .reality-card, .nb-item').forEach(el => {
+  el.classList.add('reveal');
+  observer.observe(el);
+});
 
-// ── LANGUAGE ──
+// Mute Toggle
+muteBtn.addEventListener('click', () => {
+  audio.init();
+  audio.toggleMute();
+  haptic();
+});
+
+// ── 5. LANGUAGE & CONTENT ──
 let curL = 'ar';
 function toggleLang() {
   haptic();
@@ -554,36 +568,41 @@ function toggleLang() {
     el.setAttribute('data-en', tmp);
   });
 }
+document.getElementById('langToggle').addEventListener('click', toggleLang);
 
-// ── DISSECTION ──
+// ── 6. DISSECTION ENGINE (WITH ERROR HANDLING) ──
 let curLayer = 'shell';
 const textBank = {
   ar: {
     shell: { t: 'المنطق السيادي', p: '"أرث" هي بيان لنقاء الهندسة. كل طبقة تمثل علامة فارقة في السفر عالي السرعة. انقر على الهيكل لبدء التفكيك.' },
     core: { t: 'القلب التقني', p: 'تم إزالة الهيكل الخارجي من Graphene-Carbon Monocoque. اختر قلب التوربين أو مصفوفة طاقة الغرافين.' },
-    turbine: { t: 'توربين Inconel 718', p: 'محرك نفاث مصغر يدور بـ 100,000 دورة في الدقيقة. مصنوع من Inconel 718 — نفس سبيكة محركات الطائرات. يعمل فقط كمولد طاقة، لا يلمس العجلات أبداً. 3 قطع متحركة فقط.' },
-    caps: { t: 'مصفوفة طاقة الغرافين', p: 'مكثفات غرافين فائقة تفرغ طاقتها في أجزاء من الثانية — 900 حصان لحظي. مليون دورة عمر افتراضي. لا تدهور كيميائي، لا استبدال، أداء ثابت من −40° حتى +85°.' }
+    turbine: { t: 'توربين Inconel 718', p: 'محرك نفاث مصغر يدور بـ 100,000 دورة في الدقيقة. مصنوع من Inconel 718 — نفس سبيكة محركات الطائرات. يعمل فقط كمولد طاقة، لا يلمس العجلات أبداً.' },
+    caps: { t: 'مصفوفة طاقة الغرافين', p: 'مكثفات غرافين فائقة تفرغ طاقتها في أجزاء من الثانية — 900 حصان لحظي. مليون دورة عمر افتراضي. أداء ثابت من −40° حتى +85°.' }
   },
   en: {
     shell: { t: 'Sovereign Logic', p: 'ERTH is a statement of engineering purity. Every layer is a milestone in high-speed travel. Click the chassis to begin dissection.' },
     core: { t: 'Technical Core', p: 'Graphene-Carbon Monocoque exterior removed. Select the Inconel 718 Turbine Core or the Graphene Energy Matrix.' },
-    turbine: { t: 'Inconel 718 Turbine', p: 'Micro-turbine spinning at 100,000 RPM, built from Inconel 718 — the exact alloy in jet engines. Acts purely as a generator. Never drives the wheels. Only 3 moving parts.' },
-    caps: { t: 'Graphene Energy Matrix', p: 'Graphene supercapacitors discharge in milliseconds — 900 instant horsepower. 1 million cycle lifespan. No chemical degradation. Stable performance from −40° to +85°C.' }
+    turbine: { t: 'Inconel 718 Turbine', p: 'Micro-turbine spinning at 100,000 RPM, built from Inconel 718. Acts purely as a generator. Never drives the wheels.' },
+    caps: { t: 'Graphene Energy Matrix', p: 'Graphene supercapacitors discharge in milliseconds — 900 instant horsepower. 1 million cycle lifespan.' }
   }
 };
+
 function updateInfo() {
   const n = textBank[curL][curLayer];
-  document.getElementById('info-t').innerText = n.t;
-  document.getElementById('info-p').innerText = n.p;
+  const t = document.getElementById('info-t');
+  const p = document.getElementById('info-p');
+  if(t && p) { t.innerText = n.t; p.innerText = n.p; }
 }
 
-// ── IMAGE LOADING ──
 const images = {
   shell: './assets/shell.jpg',
   core: './assets/core.jpg',
   turbine: './assets/turbine.jpg',
   caps: './assets/caps.jpg'
 };
+// Fallback colors if images fail
+const fallbacks = { shell: '#111', core: '#1a1510', turbine: '#221a10', caps: '#151a10' };
+
 const engine = document.getElementById('v-engine');
 const overlay = document.getElementById('ui-overlay');
 const hint = document.getElementById('hint');
@@ -591,20 +610,20 @@ const btnBack = document.getElementById('btn-back');
 const btnReset = document.getElementById('btn-reset');
 const loader = document.getElementById('loader');
 
-function loadImg(src, cb) {
-  console.log('📥 Loading:', src);
-  loader.classList.add('active');
+function loadImg(src, type, cb) {
+  if (loader) loader.classList.add('active');
   const img = new Image();
   img.onload = () => {
-    console.log('✅ Loaded:', src);
     engine.style.backgroundImage = `url('${src}')`;
-    loader.classList.remove('active');
+    if (loader) loader.classList.remove('active');
     if (cb) cb();
   };
   img.onerror = () => {
-    console.error('❌ Failed:', src);
-    loader.classList.remove('active');
-    showToast('فشل تحميل الصورة — تحقق من المسار');
+    console.warn(`Image ${src} not found. Using fallback.`);
+    engine.style.backgroundImage = 'none';
+    engine.style.backgroundColor = fallbacks[type] || '#111';
+    if (loader) loader.classList.remove('active');
+    if (cb) cb();
   };
   img.src = src;
 }
@@ -613,100 +632,83 @@ function startDissection() {
   if (curLayer === 'shell') {
     haptic(); audio.setState('core');
     curLayer = 'core';
-    loadImg(images.core, () => {
+    loadImg(images.core, 'core', () => {
       overlay.classList.add('active');
-      hint.style.display = 'none';
-      btnReset.style.display = 'block';
+      if(hint) hint.style.display = 'none';
+      if(btnReset) btnReset.style.display = 'block';
       updateInfo();
     });
   }
 }
-function drillTo(part, e) {
-  if (e) e.stopPropagation();
+function drillTo(part) {
   haptic(); audio.setState('detail');
   curLayer = part;
   overlay.classList.remove('active');
-  loadImg(images[part]);
-  btnBack.style.display = 'block';
-  updateInfo();
+  loadImg(images[part], part, () => {
+    if(btnBack) btnBack.style.display = 'block';
+    updateInfo();
+  });
 }
-function goBack(e) {
-  if (e) e.stopPropagation();
+function goBack() {
   haptic(); audio.setState('core');
   curLayer = 'core';
-  loadImg(images.core, () => {
+  loadImg(images.core, 'core', () => {
     overlay.classList.add('active');
-    btnBack.style.display = 'none';
+    if(btnBack) btnBack.style.display = 'none';
     updateInfo();
   });
 }
-function resetAll(e) {
-  if (e) e.stopPropagation();
+function resetAll() {
   haptic(); audio.setState('idle');
   curLayer = 'shell';
-  loadImg(images.shell, () => {
+  loadImg(images.shell, 'shell', () => {
     overlay.classList.remove('active');
-    btnReset.style.display = 'none';
-    btnBack.style.display = 'none';
-    hint.style.display = 'block';
+    if(btnReset) btnReset.style.display = 'none';
+    if(btnBack) btnBack.style.display = 'none';
+    if(hint) hint.style.display = 'block';
     updateInfo();
   });
 }
 
-// ── TABS ──
-function switchTab(tabId) {
-  document.querySelectorAll('.p-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.prompt-panel').forEach(p => p.classList.remove('active'));
-  document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
-  document.getElementById(`tab-${tabId}`).classList.add('active');
-}
-
-// ── COPY ──
-function doCopy(id, btn) {
-  const text = document.getElementById(id).innerText;
-  navigator.clipboard.writeText(text).then(() => {
-    showToast(curL === 'ar' ? 'تم النسخ' : 'COPIED');
-    const orig = btn.innerText;
-    btn.innerText = '✓';
-    setTimeout(() => btn.innerText = orig, 2000);
-  });
-}
-
-// ── INIT ──
+// ── 7. EVENT LISTENERS ──
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 ERTH App Initialized');
-  
-  // Language toggle
-  document.getElementById('langToggle').addEventListener('click', toggleLang);
-  
-  // Dissection interactions
-  engine.addEventListener('click', startDissection);
+  if(engine) engine.addEventListener('click', startDissection);
   document.querySelectorAll('.part-btn').forEach(btn => {
-    btn.addEventListener('click', e => drillTo(btn.dataset.part, e));
+    btn.addEventListener('click', () => drillTo(btn.dataset.part));
   });
-  btnBack.addEventListener('click', goBack);
-  btnReset.addEventListener('click', resetAll);
-  
-  // Tabs
+  if(btnBack) btnBack.addEventListener('click', goBack);
+  if(btnReset) btnReset.addEventListener('click', resetAll);
+
+  // Tabs Logic
   document.querySelectorAll('.p-tab').forEach(tab => {
-    tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.p-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.prompt-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    });
   });
-  
-  // Copy buttons
+
+  // Copy Logic
   document.querySelectorAll('.shot-copy').forEach(btn => {
-    btn.addEventListener('click', () => doCopy(btn.dataset.copy, btn));
-  });
-  
-  // Keyboard support
-  document.querySelectorAll('[tabindex="0"]').forEach(el => {
-    el.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        el.click();
-      }
+    btn.addEventListener('click', () => {
+      const text = document.getElementById(btn.dataset.copy).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.innerText;
+        btn.innerText = '✓';
+        setTimeout(() => btn.innerText = orig, 2000);
+      });
     });
   });
 });
+
+// ── 8. MODAL LOGIC ──
+function openModal() { modal.classList.add('open'); }
+function closeModal() { modal.classList.remove('open'); }
+function submitInquiry() {
+  alert(curL === 'ar' ? 'تم استلام طلبك. سيتواصل فريق أرث معك قريباً.' : 'Request received. ERTH team will contact you shortly.');
+  closeModal();
+}
 </script>
 </body>
 </html>
