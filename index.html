@@ -1,97 +1,853 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="author" content="Saif Ahmed">
-<meta name="description" content="ERTH Sovereign Hypercar - Interactive Technical Manifesto & Engineering Dissection">
-<title>ERTH | Sovereign Hypercar Master Specification</title>
-<link rel="stylesheet" href="css/style.css">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600&family=Tajawal:wght@200;400;500&family=Montserrat:wght@100;300;400&display=swap" rel="stylesheet">
+<meta name="project" content="ERTH Hypercar Concept 2026">
+<meta name="description" content="ERTH Sovereign Hypercar — Interactive Technical Manifesto & Engineering Dissection Experience">
+<title>أرث | ERTH Hypercar 2026</title>
+<link rel="icon" href=";base64,iVBORw0KGgo=">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Tajawal:wght@200;300;400;500&family=Montserrat:wght@100;200;300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --obsidian:#060606; --deep:#0c0c0c; --surface:#131313; --surface2:#1a1a1a;
+  --border:#222; --border2:#2e2e2e;
+  --gold:#c9a96e; --gold-light:#e8d5a3; --gold-dim:#7a6340; --gold-glow:rgba(201,169,110,0.12);
+  --text:#ede9e0; --text-dim:#7a756c; --text-muted:#3a3530;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+html{scroll-behavior:smooth;}
+body{background:var(--obsidian);color:var(--text);font-family:'Tajawal',sans-serif;font-weight:300;overflow-x:hidden;cursor:none;}
+[dir="ltr"] body{font-family:'Montserrat',sans-serif;}
+
+/* 🔹 إمكانية الوصول */
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; border-radius: 4px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  .grain { display: none; }
+}
+
+/* ── CURSOR ── */
+#cur{position:fixed;width:5px;height:5px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);}
+#cur-ring{position:fixed;width:28px;height:28px;border:1px solid rgba(201,169,110,.3);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .2s,height .2s;}
+
+/* ── GRAIN ── */
+.grain{position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;z-index:1000;opacity:.028;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain .5s steps(2) infinite;}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-1%,1%)}50%{transform:translate(1%,-1%)}75%{transform:translate(-1%,-1%)}100%{transform:translate(1%,1%)}}
+
+/* ── LANG SWITCH ── */
+.lang-switch{position:fixed;top:28px;left:36px;z-index:9999;cursor:pointer;border:none;background:none;}
+[dir="ltr"] .lang-switch{left:auto;right:36px;}
+.tear-drop{width:36px;height:54px;background:rgba(201,169,110,.08);border:1px solid var(--gold-dim);border-radius:0 0 18px 18px;display:flex;align-items:center;justify-content:center;transition:.3s;box-shadow:0 8px 24px rgba(0,0,0,.8);}
+.tear-drop:hover{background:var(--gold);transform:translateY(4px);}
+.lang-label{position:absolute;font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold);font-weight:300;transition:.3s;}
+.tear-drop:hover .lang-label{color:var(--obsidian);}
+#l-en{opacity:0;}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:-60px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--obsidian);padding:12px 36px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;letter-spacing:3px;transition:.5s;z-index:10000;opacity:0;border-radius:4px;box-shadow:0 10px 25px rgba(0,0,0,0.6);}
+#toast.show{bottom:36px;opacity:1;}
+
+/* ── LOADER ── */
+.loader{position:absolute;inset:0;background:rgba(6,6,6,0.9);display:flex;align-items:center;justify-content:center;z-index:25;opacity:0;pointer-events:none;transition:opacity .3s;}
+.loader.active{opacity:1;pointer-events:all;}
+.spinner{width:32px;height:32px;border:2px solid var(--gold-dim);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── COVER ── */
+.cover{position:relative;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;overflow:hidden;}
+.cover-bg{position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 45% at 50% 58%,rgba(201,169,110,.05) 0%,transparent 70%),
+             radial-gradient(ellipse 30% 50% at 10% 85%,rgba(201,169,110,.02) 0%,transparent 60%);}
+.cover-grid{position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 79px,rgba(201,169,110,.022) 79px,rgba(201,169,110,.022) 80px),
+             repeating-linear-gradient(90deg,transparent,transparent 79px,rgba(201,169,110,.012) 79px,rgba(201,169,110,.012) 80px);}
+.cover-content{position:relative;z-index:10;text-align:center;}
+.c-eyebrow{font-family:'Montserrat',sans-serif;font-weight:100;font-size:9px;letter-spacing:9px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:48px;opacity:0;animation:fu 1.2s ease .3s forwards;}
+.c-ar{font-family:'Tajawal',sans-serif;font-weight:200;font-size:clamp(80px,16vw,180px);color:var(--text);line-height:.85;letter-spacing:-3px;opacity:0;animation:fu 1.5s ease .5s forwards;}
+.c-en{font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;font-size:clamp(16px,2.5vw,28px);color:var(--gold);letter-spacing:8px;margin-top:10px;opacity:0;animation:fu 1.4s ease .7s forwards;}
+.c-sub{font-family:'Montserrat',sans-serif;font-weight:100;font-size:9px;letter-spacing:5px;color:var(--text-muted);margin-top:48px;opacity:0;animation:fu 1.2s ease 1s forwards;}
+.c-scroll{position:absolute;bottom:44px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;animation:fu 1s ease 1.6s forwards;}
+.c-scroll span{font-family:'Montserrat',sans-serif;font-size:8px;letter-spacing:5px;color:var(--text-muted);text-transform:uppercase;}
+.c-line{width:1px;height:44px;background:linear-gradient(to bottom,var(--gold),transparent);animation:sp 2s ease-in-out infinite;}
+@keyframes sp{0%,100%{opacity:.3}50%{opacity:1}}
+@keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.car-svg{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);width:min(720px,88vw);opacity:0;animation:fu 2s ease 1s forwards;}
+
+/* ── ENERGY FLOW ── */
+.energy-flow{display:flex;align-items:center;justify-content:center;gap:12px;margin:44px 0;flex-wrap:wrap;}
+.flow-node{border:1px solid var(--gold-dim);padding:10px 18px;background:var(--surface);color:var(--gold);font-family:'Montserrat',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;transition:.3s;}
+.flow-node:hover{background:var(--gold-glow);border-color:var(--gold);}
+.flow-arrow{color:var(--gold-dim);font-size:14px;}
+
+/* ── SECTION BASE ── */
+section{padding:100px 0;border-bottom:1px solid var(--border);}
+.container{max-width:1100px;margin:0 auto;padding:0 40px;}
+.s-num{font-family:'Montserrat',sans-serif;font-size:9px;color:var(--gold-dim);letter-spacing:6px;margin-bottom:12px;display:flex;align-items:center;gap:14px;text-transform:uppercase;}
+.s-num::after{content:'';height:1px;width:36px;background:var(--gold-dim);}
+.s-title{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,5.5vw,60px);font-weight:300;line-height:1.1;letter-spacing:-1px;}
+.s-title-ar{font-family:'Tajawal',sans-serif;font-weight:200;font-size:clamp(13px,1.6vw,16px);color:var(--gold);letter-spacing:3px;margin-bottom:52px;margin-top:4px;}
+.divider{height:1px;background:linear-gradient(to right,transparent,var(--gold-dim),transparent);}
+
+/* ── REVEAL ── */
+.rv{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s ease;}
+.rv.on{opacity:1;transform:translateY(0);}
+
+/* ── STATS STRIP ── */
+.stats-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;margin-top:64px;}
+.stat-box{background:var(--surface);border:1px solid var(--border);padding:28px 20px;text-align:center;transition:border-color .3s,background .3s;position:relative;overflow:hidden;}
+.stat-box::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transition:transform .4s;}
+.stat-box:hover::after{transform:scaleX(1);}
+.stat-box:hover{border-color:var(--gold-dim);background:rgba(201,169,110,.03);}
+.stat-val{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,2.5vw,36px);font-weight:300;color:var(--text);line-height:1;}
+.stat-unit{font-family:'Montserrat',sans-serif;font-size:8px;font-weight:200;color:var(--gold);letter-spacing:2px;margin-top:4px;}
+.stat-lbl{font-size:10px;color:var(--text-muted);margin-top:6px;font-weight:300;letter-spacing:.5px;}
+
+/* ── DISSECTION ── */
+.visual-engine{height:520px;background:var(--surface);border:1px solid var(--border);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background-size:cover;background-position:center;transition:background-image .8s ease-in-out,transform .1s cubic-bezier(.17,.67,.83,.67);cursor:pointer;}
+.engine-hint{position:absolute;z-index:10;color:var(--gold);font-family:'Montserrat',sans-serif;font-size:9px;letter-spacing:5px;animation:pulse 2s infinite;text-align:center;padding:16px 28px;background:rgba(0,0,0,.65);backdrop-filter:blur(12px);border:1px solid var(--gold-dim);text-transform:uppercase;pointer-events:none;}
+@keyframes pulse{0%,100%{opacity:.4;transform:scale(.98)}50%{opacity:1;transform:scale(1.02)}}
+.dissection-ui{position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:.6s;}
+.dissection-ui.active{opacity:1;pointer-events:all;}
+.parts-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.part-btn{background:rgba(6,6,6,.96);border:1px solid var(--gold-dim);padding:32px 44px;cursor:pointer;transition:.4s;text-align:center;color:var(--gold);backdrop-filter:blur(12px);font-family:'Montserrat',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;}
+.part-btn:hover{background:var(--gold);color:var(--obsidian);transform:translateY(-6px);box-shadow:0 20px 40px rgba(0,0,0,.7);}
+.engine-nav{position:absolute;bottom:24px;width:100%;padding:0 32px;display:flex;justify-content:space-between;z-index:30;}
+.btn-eng{background:rgba(6,6,6,.92);border:1px solid var(--gold-dim);color:var(--gold);padding:10px 22px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:9px;letter-spacing:3px;display:none;transition:.3s;text-transform:uppercase;}
+.btn-eng:hover{background:var(--gold);color:var(--obsidian);}
+.info-panel{padding:44px;background:var(--deep);border-right:3px solid var(--gold);margin-top:20px;}
+[dir="ltr"] .info-panel{border-right:none;border-left:3px solid var(--gold);}
+#info-t{color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:36px;margin-bottom:16px;font-weight:300;}
+#info-p{color:var(--text-dim);font-size:16px;max-width:860px;line-height:2;font-weight:300;}
+
+/* ── TECH GRID ── */
+.tech-master-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:48px;}
+.tech-box{background:var(--surface);border:1px solid var(--border);padding:36px;border-right:3px solid var(--gold-dim);transition:border-color .3s;}
+[dir="ltr"] .tech-box{border-right:none;border-left:3px solid var(--gold-dim);}
+.tech-box:hover{border-color:var(--gold-dim);}
+.tech-box h4{font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:26px;margin-bottom:20px;font-weight:300;}
+.tech-box ul{list-style:none;}
+.tech-box li{color:var(--text-dim);font-size:13px;margin-bottom:12px;line-height:1.7;padding-right:16px;border-right:1px solid var(--border2);}
+[dir="ltr"] .tech-box li{padding-right:0;padding-left:16px;border-right:none;border-left:1px solid var(--border2);}
+.tech-box b{color:var(--text);font-weight:500;}
+
+/* ── SPECS TABLE ── */
+.specs-tbl{width:100%;border-collapse:collapse;margin-top:48px;}
+.specs-tbl tr{border-bottom:1px solid var(--border);}
+.specs-tbl tr:last-child{border:none;}
+.specs-tbl td{padding:18px 0;font-size:13px;font-weight:300;}
+.specs-tbl td:first-child{color:var(--text-muted);width:45%;font-size:10px;letter-spacing:3px;text-transform:uppercase;}
+.specs-tbl td:last-child{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold);text-align:left;}
+[dir="ltr"] .specs-tbl td:last-child{text-align:left;}
+.tbl-group td{font-family:'Montserrat',sans-serif!important;font-size:8px!important;letter-spacing:5px!important;text-transform:uppercase;color:var(--gold-dim)!important;padding-top:32px!important;padding-bottom:12px!important;}
+
+/* ── REALITY CHECK ── */
+.reality-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:48px;}
+.reality-card{background:var(--surface);border:1px solid var(--border);padding:32px;position:relative;overflow:hidden;}
+.reality-card::before{content:'';position:absolute;top:0;right:0;width:3px;height:100%;}
+.reality-card.green::before{background:#4a9}
+.reality-card.yellow::before{background:#ca4}
+.reality-card.red::before{background:#a44}
+.rc-badge{font-family:'Montserrat',sans-serif;font-size:8px;font-weight:200;letter-spacing:4px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.rc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.green .rc-dot{background:#4a9;}
+.yellow .rc-dot{background:#ca4;}
+.red .rc-dot{background:#a44;}
+.green .rc-badge{color:#4a9;}
+.yellow .rc-badge{color:#ca4;}
+.red .rc-badge{color:#a44;}
+.rc-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;color:var(--text);margin-bottom:10px;}
+.rc-desc{font-size:12px;color:var(--text-dim);line-height:1.75;font-weight:300;}
+
+/* ── PROMPT GENERATOR ── */
+.prompt-tabs{display:flex;gap:2px;margin-bottom:2px;flex-wrap:wrap;}
+.p-tab{font-family:'Montserrat',sans-serif;font-size:8px;font-weight:200;letter-spacing:3px;text-transform:uppercase;padding:12px 20px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);cursor:pointer;transition:all .2s;user-select:none;}
+.p-tab:hover{color:var(--text-dim);}
+.p-tab.active{background:rgba(201,169,110,.08);border-color:var(--gold-dim);color:var(--gold);}
+.prompt-panel{display:none;background:var(--surface);border:1px solid var(--border);padding:36px;}
+.prompt-panel.active{display:block;}
+.pp-label{font-family:'Montserrat',sans-serif;font-size:8px;font-weight:200;letter-spacing:5px;text-transform:uppercase;color:var(--gold-dim);margin-bottom:20px;}
+.shot-row{display:flex;gap:10px;align-items:stretch;margin-bottom:14px;}
+.shot-label{font-family:'Montserrat',sans-serif;font-size:7px;font-weight:200;letter-spacing:3px;color:var(--text-muted);text-transform:uppercase;writing-mode:vertical-rl;transform:rotate(180deg);padding:6px 0;flex-shrink:0;min-width:26px;text-align:center;}
+.shot-box{flex:1;background:var(--obsidian);border:1px solid var(--border2);padding:18px 20px;position:relative;transition:border-color .2s;}
+.shot-box:hover{border-color:var(--gold-dim);}
+.shot-prompt{font-family:'Montserrat',sans-serif;font-size:11px;font-weight:200;line-height:1.7;color:var(--text-dim);direction:ltr;text-align:left;}
+.shot-copy{position:absolute;top:10px;left:10px;font-family:'Montserrat',sans-serif;font-size:7px;font-weight:200;letter-spacing:2px;color:var(--gold-dim);cursor:pointer;padding:5px 10px;border:1px solid var(--border2);background:var(--surface2);transition:all .2s;text-transform:uppercase;user-select:none;}
+.shot-copy:hover{color:var(--gold);border-color:var(--gold-dim);}
+.pp-note{margin-top:24px;padding:18px 22px;border-right:2px solid var(--gold-dim);background:rgba(201,169,110,.03);}
+.pp-note p{font-size:11px;color:var(--text-muted);line-height:1.8;font-weight:300;}
+.pp-note strong{color:var(--gold-dim);font-weight:400;}
+
+/* ── NABRAS ── */
+.nabras-layout{display:grid;grid-template-columns:1fr 1.5fr;gap:64px;align-items:start;}
+.nabras-big{font-family:'Tajawal',sans-serif;font-weight:200;font-size:clamp(52px,9vw,96px);color:var(--text);line-height:1;}
+.nabras-en{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--gold);letter-spacing:5px;margin-bottom:28px;}
+.nabras-p{font-size:13px;color:var(--text-dim);line-height:1.9;font-weight:300;}
+.nabras-list{display:flex;flex-direction:column;gap:2px;}
+.nb-item{display:flex;align-items:flex-start;gap:18px;padding:22px 26px;background:var(--surface);border:1px solid var(--border);transition:border-color .3s;}
+.nb-item:hover{border-color:var(--gold-dim);}
+.nb-dot{width:5px;height:5px;background:var(--gold);border-radius:50%;margin-top:6px;flex-shrink:0;}
+.nb-tag{font-family:'Montserrat',sans-serif;font-size:8px;font-weight:200;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
+.nb-desc{font-size:12px;color:var(--text-dim);line-height:1.7;font-weight:300;}
+
+/* ── FOOTER ── */
+.footer{padding:64px 0;border-top:1px solid var(--border);background:var(--deep);}
+.footer-in{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;}
+.f-brand{font-family:'Tajawal',sans-serif;font-weight:200;font-size:26px;color:var(--text);}
+.f-brand span{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;color:var(--gold);letter-spacing:4px;display:block;}
+.f-copy{font-family:'Montserrat',sans-serif;font-size:8px;font-weight:100;letter-spacing:3px;color:var(--text-muted);text-align:center;line-height:2;}
+.f-sig{font-family:'Montserrat',sans-serif;font-size:8px;font-weight:100;letter-spacing:4px;color:var(--text-muted);}
+.f-sig strong{font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--gold-dim);letter-spacing:2px;display:block;font-weight:300;}
+
+@media(max-width:800px){
+  .container{padding:0 20px;}
+  section{padding:72px 0;}
+  .stats-strip{grid-template-columns:repeat(3,1fr);}
+  .tech-master-grid,.reality-grid,.nabras-layout{grid-template-columns:1fr;}
+  .parts-grid{grid-template-columns:1fr;}
+  .prompt-tabs{gap:4px;}
+  .shot-row{flex-direction:column;}
+  .shot-label{writing-mode:horizontal-tb;transform:none;}
+  .footer-in{flex-direction:column;text-align:center;}
+}
+</style>
 </head>
 <body>
 
-<div id="toast" aria-live="polite">تم النسخ</div>
+<div class="grain"></div>
+<div id="cur"></div>
+<div id="cur-ring"></div>
+<div id="toast" aria-live="polite">تم النسخ · COPIED</div>
 
 <button class="lang-switch" id="langToggle" aria-label="تبديل اللغة">
   <div class="tear-drop">
-    <span class="lang-label lang-ar-label" id="l-ar">ع</span>
-    <span class="lang-label lang-en-label" id="l-en" style="opacity:0">E</span>
+    <span class="lang-label" id="l-ar">ع</span>
+    <span class="lang-label" id="l-en" style="opacity:0;position:absolute;">E</span>
   </div>
 </button>
 
-<div class="container">
-  <section style="text-align:center; padding-top:120px; border:none;">
-    <div class="s-num">PROJECT ERTH · TECHNICAL DATA</div>
-    <h1 class="s-title" id="main-title" data-en="ERTH: The Master Manifesto">أرث: المانيفستو التقني</h1>
-    <div class="energy-flow">
-      <div class="flow-node" data-en="MICRO-TURBINE">توربين نفاذ</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-node" data-en="GENERATOR">مولد</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-node" data-en="CAPACITORS">مكثفات غرافين</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-node" data-en="4x MOTORS">4 محركات محورية</div>
-    </div>
-  </section>
+<!-- ══ COVER ══ -->
+<div class="cover">
+  <div class="cover-bg"></div>
+  <div class="cover-grid"></div>
+  <div class="cover-content">
+    <div class="c-eyebrow" data-en="SOVEREIGN HYPERCAR · ERTH-2026 · TECHNICAL MANIFESTO">هايبركار سيادي · ERTH-2026 · المانيفستو التقني</div>
+    <div class="c-ar" data-en="ERTH">أرث</div>
+    <div class="c-en">ERTH Hypercar · 2026</div>
+    <div class="c-sub" data-en="YEMENI ENGINEERING · HYPERSONIC PHYSICS">هندسة يمانية · فيزياء فرط صوتية</div>
+  </div>
 
-  <section id="dissection-sec">
-    <div class="s-num">01 · ARCHITECTURAL LAYERS</div>
-    <h2 class="s-title" id="sec-title" data-en="Engineering Visuals">المعاينة الهندسية</h2>
-    
-    <div class="visual-engine" id="v-engine" tabindex="0" role="button" aria-label="بدء وضع التفكيك الهندسي">
+  <svg class="car-svg" viewBox="0 0 820 270" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <ellipse cx="410" cy="254" rx="355" ry="9" fill="rgba(201,169,110,0.05)"/>
+    <path d="M72 188 Q83 188 94 176 L136 154 L193 116 Q240 84 316 71 L433 66 Q528 64 586 84 L663 116 L716 150 L730 168 L732 188 Z" fill="rgba(16,16,16,0.97)" stroke="rgba(201,169,110,0.42)" stroke-width="1.2"/>
+    <path d="M193 116 Q246 74 324 61 L446 58 Q542 57 590 80 L663 116" fill="none" stroke="rgba(201,169,110,0.62)" stroke-width="1.4"/>
+    <path d="M193 116 L233 86 L318 67 L318 116 Z" fill="rgba(100,155,210,0.06)" stroke="rgba(201,169,110,0.22)" stroke-width=".8"/>
+    <path d="M563 80 L606 90 L658 116 L563 118 Z" fill="rgba(100,155,210,0.06)" stroke="rgba(201,169,110,0.22)" stroke-width=".8"/>
+    <line x1="373" y1="69" x2="373" y2="186" stroke="rgba(201,169,110,0.1)" stroke-width=".6"/>
+    <line x1="496" y1="66" x2="496" y2="187" stroke="rgba(201,169,110,0.1)" stroke-width=".6"/>
+    <line x1="80" y1="164" x2="104" y2="148" stroke="rgba(255,255,220,1)" stroke-width="2"/>
+    <line x1="80" y1="169" x2="110" y2="154" stroke="rgba(255,255,220,.3)" stroke-width=".8"/>
+    <path d="M664 153 L728 167" stroke="rgba(255,80,80,1)" stroke-width="2"/>
+    <path d="M664 158 L726 171" stroke="rgba(255,80,80,.3)" stroke-width=".8"/>
+    <circle cx="208" cy="204" r="40" fill="rgba(10,10,10,.97)" stroke="rgba(201,169,110,.38)" stroke-width="1.5"/>
+    <circle cx="208" cy="204" r="27" fill="none" stroke="rgba(201,169,110,.12)" stroke-width=".8"/>
+    <line x1="208" y1="177" x2="208" y2="231" stroke="rgba(201,169,110,.18)" stroke-width=".7"/>
+    <line x1="181" y1="204" x2="235" y2="204" stroke="rgba(201,169,110,.18)" stroke-width=".7"/>
+    <line x1="188" y1="183" x2="228" y2="223" stroke="rgba(201,169,110,.13)" stroke-width=".6"/>
+    <line x1="228" y1="183" x2="188" y2="223" stroke="rgba(201,169,110,.13)" stroke-width=".6"/>
+    <circle cx="208" cy="204" r="5" fill="rgba(201,169,110,.5)"/>
+    <circle cx="598" cy="204" r="40" fill="rgba(10,10,10,.97)" stroke="rgba(201,169,110,.38)" stroke-width="1.5"/>
+    <circle cx="598" cy="204" r="27" fill="none" stroke="rgba(201,169,110,.12)" stroke-width=".8"/>
+    <line x1="598" y1="177" x2="598" y2="231" stroke="rgba(201,169,110,.18)" stroke-width=".7"/>
+    <line x1="571" y1="204" x2="625" y2="204" stroke="rgba(201,169,110,.18)" stroke-width=".7"/>
+    <line x1="578" y1="183" x2="618" y2="223" stroke="rgba(201,169,110,.13)" stroke-width=".6"/>
+    <line x1="618" y1="183" x2="578" y2="223" stroke="rgba(201,169,110,.13)" stroke-width=".6"/>
+    <circle cx="598" cy="204" r="5" fill="rgba(201,169,110,.5)"/>
+    <line x1="208" y1="248" x2="598" y2="248" stroke="rgba(201,169,110,.15)" stroke-width=".8" stroke-dasharray="3,5"/>
+    <line x1="208" y1="244" x2="208" y2="252" stroke="rgba(201,169,110,.28)" stroke-width=".8"/>
+    <line x1="598" y1="244" x2="598" y2="252" stroke="rgba(201,169,110,.28)" stroke-width=".8"/>
+    <text x="403" y="262" text-anchor="middle" font-family="Montserrat" font-size="8" fill="rgba(201,169,110,.3)" letter-spacing="2">3150mm · QUAD-MOTOR AWD · TORQUE VECTORING</text>
+    <rect x="124" y="136" width="9" height="6" fill="rgba(201,169,110,.55)" rx="1"/>
+    <text x="400" y="48" text-anchor="middle" font-family="Montserrat" font-size="7" fill="rgba(201,169,110,.2)" letter-spacing="3">Cd 0.18 · GRAPHENE-CARBON MONOCOQUE · 1,450 KG</text>
+  </svg>
+
+  <div class="c-scroll"><span data-en="EXPLORE">اكتشف</span><div class="c-line"></div></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ MANIFESTO ══ -->
+<section style="background:var(--deep);">
+  <div class="container">
+    <div class="rv">
+      <div class="s-num" data-en="00 · THE MANIFESTO">00 · المانيفستو</div>
+      <h2 class="s-title" data-en="Absolute Dependability. Visual Silence.">الاعتمادية المطلقة. الهدوء البصري.</h2>
+      <div class="s-title-ar" data-en="Yemeni Engineering · Hypersonic Physics">هندسة يمانية · فيزياء فرط صوتية</div>
+    </div>
+    <div class="rv">
+      <div class="energy-flow">
+        <div class="flow-node" data-en="MICRO-TURBINE · INCONEL 718">توربين · Inconel 718</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node" data-en="CERAMIC HEAT EXCHANGER">مبدل حراري سيراميكي</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node" data-en="GRAPHENE SUPERCAPACITORS">مكثفات غرافين</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node" data-en="4× HUB MOTORS + TORQUE VECTORING">4 محركات محورية + Torque Vectoring</div>
+      </div>
+    </div>
+    <div class="stats-strip rv">
+      <div class="stat-box"><div class="stat-val">900</div><div class="stat-unit">HP TOTAL</div><div class="stat-lbl" data-en="Total Output">القوة الكلية</div></div>
+      <div class="stat-box"><div class="stat-val">1.9<span style="font-size:16px">s</span></div><div class="stat-unit">0→100</div><div class="stat-lbl" data-en="0-100 km/h">التسارع</div></div>
+      <div class="stat-box"><div class="stat-val">5.8<span style="font-size:16px">s</span></div><div class="stat-unit">0→200</div><div class="stat-lbl" data-en="0-200 km/h">التسارع المزدوج</div></div>
+      <div class="stat-box"><div class="stat-val">420</div><div class="stat-unit">KM/H MAX</div><div class="stat-lbl" data-en="Top Speed">السرعة القصوى</div></div>
+      <div class="stat-box"><div class="stat-val">850</div><div class="stat-unit">KM RANGE</div><div class="stat-lbl" data-en="Max Range">المدى الأقصى</div></div>
+      <div class="stat-box"><div class="stat-val">1,450</div><div class="stat-unit">KG · 1.61/HP</div><div class="stat-lbl" data-en="Weight · Power-to-Weight">الوزن · النسبة</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══ DISSECTION ══ -->
+<section>
+  <div class="container">
+    <div class="rv">
+      <div class="s-num" data-en="01 · ARCHITECTURAL LAYERS">01 · الطبقات الهيكلية</div>
+      <h2 class="s-title" data-en="Interactive Dissection">التفكيك الهيكلي التفاعلي</h2>
+      <div class="s-title-ar" data-en="Click to Explore Engineering Layers">انقر لاستكشاف الطبقات الهندسية</div>
+    </div>
+    <div class="visual-engine rv" id="v-engine" tabindex="0" role="button" aria-label="بدء وضع التفكيك الهندسي" style="background-image:url('./assets/shell.jpg');">
       <div class="loader" id="loader" aria-hidden="true"><div class="spinner"></div></div>
-      <div id="hint" data-en="CLICK TO DISSECT">انقر للتفكيك</div>
+      <div id="hint" class="engine-hint" data-en="⚡ CLICK TO DISSECT THE CHASSIS ⚡">⚡ انقر على الهيكل لبدء التفكيك ⚡</div>
       <div id="ui-overlay" class="dissection-ui">
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-          <div class="part-btn" data-part="turbine" data-en="TURBINE CORE" tabindex="0" role="button">قلب التوربين</div>
-          <div class="part-btn" data-part="caps" data-en="ENERGY BANK" tabindex="0" role="button">مخزن الطاقة</div>
+        <div class="parts-grid">
+          <div class="part-btn" data-part="turbine" data-en="TURBINE CORE · INCONEL 718" tabindex="0" role="button">قلب التوربين · Inconel 718</div>
+          <div class="part-btn" data-part="caps" data-en="GRAPHENE ENERGY MATRIX" tabindex="0" role="button">مصفوفة طاقة الغرافين</div>
         </div>
       </div>
       <div class="engine-nav">
-        <button id="btn-back" class="btn-eng" data-en="BACK" tabindex="0">عودة</button>
-        <button id="btn-reset" class="btn-eng" data-en="REASSEMBLE" tabindex="0">إعادة تجميع</button>
+        <button id="btn-back" class="btn-eng" data-en="← BACK" tabindex="0">← عودة</button>
+        <button id="btn-reset" class="btn-eng" data-en="REASSEMBLE" tabindex="0">إعادة التجميع</button>
       </div>
     </div>
-  </section>
+    <div class="info-panel rv">
+      <h3 id="info-t" data-en="Sovereign Logic">المنطق السيادي</h3>
+      <p id="info-p" data-en="ERTH is a statement of engineering purity. Every layer is a milestone in high-speed travel. Click the chassis to begin the dissection.">"أرث" هي بيان لنقاء الهندسة. كل طبقة تمثل علامة فارقة في السفر عالي السرعة. انقر على الهيكل لبدء التفكيك.</p>
+    </div>
+  </div>
+</section>
 
-  <section>
-    <div class="s-num">02 · FULL SPECIFICATION</div>
-    <h2 class="s-title" id="specs-title" data-en="Performance Matrix">مصفوفة الأداء</h2>
-    <div class="tech-master-grid">
+<div class="divider"></div>
+
+<!-- ══ FULL SPECS ══ -->
+<section style="background:var(--deep);">
+  <div class="container">
+    <div class="rv">
+      <div class="s-num" data-en="02 · FULL SPECIFICATION">02 · المواصفات الكاملة</div>
+      <h2 class="s-title" data-en="Engineering Matrix">مصفوفة الهندسة</h2>
+      <div class="s-title-ar" data-en="Every Number Is A Promise">كل رقم هو وعد</div>
+    </div>
+    <div class="tech-master-grid rv">
       <div class="tech-box">
         <h4 data-en="Power System">منظومة القوة</h4>
         <ul>
-          <li data-en="<b>Primary Gen:</b> Micro-Turbine (Inconel 718)"><b>المولد:</b> توربين غازي (Inconel 718)</li>
-          <li data-en="<b>Energy Matrix:</b> Graphene Capacitors"><b>التخزين:</b> مكثفات غرافين فائقة</li>
+          <li data-en="<b>Primary Gen:</b> Micro-Turbine (Inconel 718)"><b>المولد:</b> توربين غازي Inconel 718</li>
+          <li data-en="<b>Energy Matrix:</b> Graphene Supercapacitors · 1M cycles"><b>التخزين:</b> مكثفات غرافين · مليون دورة</li>
           <li data-en="<b>Cooling:</b> Ceramic Heat Exchanger"><b>التبريد:</b> مبدل حراري سيراميكي</li>
-          <li data-en="<b>Fuel:</b> 75L Multi-fuel System"><b>الوقود:</b> نظام وقود حيوي 75 لتر</li>
+          <li data-en="<b>Fuel:</b> Bio-fuel 75L multi-fuel system"><b>الوقود:</b> وقود حيوي · 75 لتر</li>
+          <li data-en="<b>Recovery:</b> KERS kinetic + thermal"><b>الاسترداد:</b> KERS حركي + حراري</li>
         </ul>
       </div>
       <div class="tech-box">
-        <h4 data-en="The Chassis">الهيكل الميكانيكي</h4>
+        <h4 data-en="Chassis & Dynamics">الهيكل والديناميكا</h4>
         <ul>
-          <li data-en="<b>Structure:</b> Graphene-Carbon Monocoque"><b>البناء:</b> أحادي من الكاربون والغرافين</li>
-          <li data-en="<b>Dynamics:</b> Power-to-Weight 1.61 KG/HP"><b>الديناميكا:</b> 1.61 كجم لكل حصان</li>
-          <li data-en="<b>Safety:</b> Automatic Fire Suppression"><b>الأمان:</b> إخماد حريق CO2 آلي</li>
-          <li data-en="<b>Suspension:</b> Active Maglev Struts"><b>التعليق:</b> مساعدات مغناطيسية نشطة</li>
+          <li data-en="<b>Structure:</b> Graphene-Carbon Monocoque"><b>البناء:</b> Graphene-Carbon Monocoque</li>
+          <li data-en="<b>Drive:</b> Quad-Motor AWD + Torque Vectoring"><b>الدفع:</b> 4 محركات + Torque Vectoring</li>
+          <li data-en="<b>Suspension:</b> Active Maglev + LiDAR 1000/s"><b>التعليق:</b> Maglev نشط + LiDAR 1000/ث</li>
+          <li data-en="<b>Steering:</b> 4-Wheel Steering"><b>التوجيه:</b> توجيه رباعي المحاور</li>
+          <li data-en="<b>Safety:</b> CO2 Auto Fire Suppression"><b>الأمان:</b> إخماد حريق CO2 آلي</li>
+        </ul>
+      </div>
+      <div class="tech-box">
+        <h4 data-en="Aerodynamics">الديناميكا الهوائية</h4>
+        <ul>
+          <li data-en="<b>Drag:</b> Cd 0.18 (below any production car)"><b>السحب:</b> معامل 0.18 Cd</li>
+          <li data-en="<b>Body:</b> Monovolume CFD-driven form"><b>الجسم:</b> Monovolume منحوت بالهواء</li>
+          <li data-en="<b>Inlets:</b> Variable Aero Inlets (auto)"><b>الفتحات:</b> Variable Aero Inlets آلية</li>
+          <li data-en="<b>Effect:</b> Longtail rear for wake reduction"><b>الخلفية:</b> Longtail لتقليل الدوامات</li>
+        </ul>
+      </div>
+      <div class="tech-box">
+        <h4 data-en="Interior & Intelligence">الداخلية والذكاء</h4>
+        <ul>
+          <li data-en="<b>Interface:</b> Full AR-HUD windshield"><b>الواجهة:</b> AR-HUD زجاج أمامي كامل</li>
+          <li data-en="<b>Windows:</b> Transparent OLED rear glass"><b>النوافذ:</b> OLED شفاف خلفي</li>
+          <li data-en="<b>Sound:</b> Structural 7D audio (no visible speakers)"><b>الصوت:</b> هيكلي 7D بلا سماعات ظاهرة</li>
+          <li data-en="<b>AI:</b> Nabras — predictive diagnostics"><b>الذكاء:</b> نبراس — تنبؤ بالأعطال</li>
+          <li data-en="<b>Materials:</b> Natural wood · plant fiber · gold stitch"><b>الخامات:</b> خشب طبيعي · ألياف نباتية · تطريز ذهبي</li>
         </ul>
       </div>
     </div>
 
-    <table class="specs-table">
-      <tr><td data-en="0-100 KM/H">التسارع 0-100 كم/س</td><td class="val">1.9 SEC</td></tr>
-      <tr><td data-en="0-200 KM/H">التسارع 0-200 كم/س</td><td class="val">5.8 SEC</td></tr>
-      <tr><td data-en="MAX RANGE">المدى الأقصى</td><td class="val">850 KM</td></tr>
-      <tr><td data-en="TOTAL OUTPUT">القوة الإجمالية</td><td class="val">900 HP</td></tr>
-      <tr><td data-en="STATUS">حالة الامتلاك</td><td class="val" id="status-val" data-en="AVAILABLE UPON REQUEST">متاح عند الطلب</td></tr>
+    <table class="specs-tbl rv">
+      <tr class="tbl-group"><td colspan="2" data-en="PERFORMANCE · VERIFIED TARGETS">الأداء · أهداف مدروسة</td></tr>
+      <tr><td data-en="0 → 100 KM/H">التسارع 0 → 100 كم/س</td><td>1.9 ثانية</td></tr>
+      <tr><td data-en="0 → 200 KM/H">التسارع 0 → 200 كم/س</td><td>5.8 ثانية</td></tr>
+      <tr><td data-en="TOP SPEED">السرعة القصوى</td><td>420 كم/س</td></tr>
+      <tr><td data-en="MAX RANGE">المدى الأقصى</td><td>850 كم</td></tr>
+      <tr><td data-en="TOTAL POWER">القوة الإجمالية</td><td>900 حصان</td></tr>
+      <tr class="tbl-group"><td colspan="2" data-en="STRUCTURE · VERIFIED">الهيكل</td></tr>
+      <tr><td data-en="TOTAL WEIGHT">الوزن الكلي</td><td>1,450 كجم</td></tr>
+      <tr><td data-en="POWER-TO-WEIGHT">نسبة القوة للوزن</td><td>1.61 كجم / حصان</td></tr>
+      <tr><td data-en="DRAG COEFFICIENT">معامل السحب</td><td>0.18 Cd</td></tr>
+      <tr><td data-en="WHEELBASE">قاعدة العجلات</td><td>3,150 ملم</td></tr>
+      <tr><td data-en="OVERALL LENGTH">الطول الإجمالي</td><td>4,680 ملم</td></tr>
+      <tr class="tbl-group"><td colspan="2" data-en="MATERIALS · LOCAL &amp; RENEWABLE">المواد · محلية ومتجددة</td></tr>
+      <tr><td data-en="CHASSIS">الشاسيه</td><td>Graphene-Carbon Monocoque</td></tr>
+      <tr><td data-en="TURBINE ALLOY">سبيكة التوربين</td><td>Inconel 718</td></tr>
+      <tr><td data-en="INTERIOR TRIM">تشطيبات الداخلية</td><td>أخشاب طبيعية · ألياف نباتية</td></tr>
+      <tr><td data-en="SIGNATURE">التوقيع</td><td>Signature Line · تطريز ذهبي</td></tr>
     </table>
-  </section>
-</div>
+  </div>
+</section>
 
-<footer>ERTH MASTER BUILD · BY SAIF AHMED · 2026</footer>
+<div class="divider"></div>
 
-<script src="js/app.js" defer></script>
+<!-- ══ REALITY CHECK ══ -->
+<section>
+  <div class="container">
+    <div class="rv">
+      <div class="s-num" data-en="03 · ENGINEERING REALITY CHECK">03 · التقييم الهندسي الواقعي</div>
+      <h2 class="s-title" data-en="Honest Assessment">التقييم بصدق</h2>
+      <div class="s-title-ar" data-en="What Is Real · What Is Ambitious · What Needs Work">ما هو واقعي · ما هو طموح · ما يحتاج عمل</div>
+    </div>
+    <div class="reality-grid rv">
+      <div class="reality-card green">
+        <div class="rc-badge"><div class="rc-dot"></div><span data-en="READY NOW · PROVEN TECH">واقعي الآن · تقنية مثبتة</span></div>
+        <div class="rc-title" data-en="Structure & Aero">الهيكل والديناميكا</div>
+        <div class="rc-desc" data-en="Graphene-Carbon Monocoque, Maglev suspension, 4-Wheel Steering, Variable Aero Inlets — all exist in production or racing today. Cd 0.18 is ambitious but physically achievable with the Monovolume form.">Graphene-Carbon Monocoque، تعليق Maglev، التوجيه الرباعي، الفتحات الآلية — كلها موجودة في الإنتاج أو السباق اليوم. Cd 0.18 طموح لكن قابل فيزيائياً مع الـ Monovolume.</div>
+      </div>
+      <div class="reality-card green">
+        <div class="rc-badge"><div class="rc-dot"></div><span data-en="READY NOW · PROVEN TECH">واقعي الآن · تقنية مثبتة</span></div>
+        <div class="rc-title" data-en="Inconel 718 Turbine">توربين Inconel 718</div>
+        <div class="rc-desc" data-en="Inconel 718 is the exact alloy used in jet engines today. Using it as a range-extender generator is the smartest move in this manifesto — proven material, proven reliability, zero compromise.">Inconel 718 هي نفس السبيكة المستخدمة في محركات الطائرات اليوم. استخدامها كمولد Range Extender هو أذكى قرار في المانيفستو — مادة مثبتة، اعتمادية صفرية.</div>
+      </div>
+      <div class="reality-card yellow">
+        <div class="rc-badge"><div class="rc-dot"></div><span data-en="AMBITIOUS · 2027-2030">طموح · 2027-2030</span></div>
+        <div class="rc-title" data-en="Graphene Supercapacitors">مكثفات الغرافين</div>
+        <div class="rc-desc" data-en="Lab-proven, not yet mass-produced. The 1M cycle lifespan is real. The challenge is industrial-scale manufacturing. Solution: hybrid Solid-State + Supercapacitor bridge until Graphene production scales.">مثبتة في المختبر، لم تُنتج بعد صناعياً بحجم كافٍ. عمر المليون دورة حقيقي. التحدي هو التصنيع الضخم. حل مؤقت: Solid-State + Supercapacitor حتى يتوسع إنتاج الغرافين.</div>
+      </div>
+      <div class="reality-card yellow">
+        <div class="rc-badge"><div class="rc-dot"></div><span data-en="AMBITIOUS · NEEDS VALIDATION">طموح · يحتاج إثبات</span></div>
+        <div class="rc-title" data-en="0-100 in 1.9 Seconds">0-100 في 1.9 ثانية</div>
+        <div class="rc-desc" data-en="Physically possible with 900HP Quad-Motor + Torque Vectoring. The challenge is not power — it's traction. Rimac Nevera achieves 1.85s. ERTH's Torque Vectoring solves grip distribution. Achievable with tuning.">ممكن فيزيائياً مع 900 حصان + Torque Vectoring. التحدي ليس القوة — التحدي في الجر. Rimac Nevera تحقق 1.85 ثانية. الـ Torque Vectoring في أرث يحل توزيع القوة. قابل للتحقيق بالضبط الدقيق.</div>
+      </div>
+      <div class="reality-card green">
+        <div class="rc-badge"><div class="rc-dot"></div><span data-en="READY NOW · PROVEN TECH">واقعي الآن · تقنية مثبتة</span></div>
+        <div class="rc-title" data-en="850 KM Range">مدى 850 كم</div>
+        <div class="rc-desc" data-en="With a Rotary Range Extender + 75L bio-fuel + Graphene capacitors for peak power, 850 KM is realistic. The Rotary runs only when needed — near-zero mechanical wear.">مع Rotary Range Extender + 75 لتر وقود حيوي + المكثفات للذروة، 850 كم واقعي. الروتاري يشتغل فقط عند الحاجة — تآكل ميكانيكي شبه صفري.</div>
+      </div>
+      <div class="reality-card green">
+        <div class="rc-badge"><div class="rc-dot"></div><span data-en="STRATEGIC ADVANTAGE">ميزة استراتيجية</span></div>
+        <div class="rc-title" data-en="Local & Renewable Materials">مواد محلية ومتجددة</div>
+        <div class="rc-desc" data-en="This is ERTH's hidden weapon. While Ferrari sources carbon from Japan and Rolls Royce imports leather from Europe, ERTH builds on local renewable materials — lower cost, Vision 2030 aligned, sovereign supply chain.">هذا هو السلاح الخفي لأرث. بينما Ferrari تستورد الكاربون من اليابان وRolls Royce الجلود من أوروبا، أرث تبني على مواد محلية متجددة — تكلفة أقل، متوافقة مع رؤية 2030، سلسلة توريد سيادية.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══ NABRAS ══ -->
+<section style="background:var(--deep);">
+  <div class="container">
+    <div class="nabras-layout">
+      <div class="rv">
+        <div class="s-num" data-en="04 · AI INTELLIGENCE">04 · الذكاء الاصطناعي</div>
+        <div class="nabras-big">نبراس</div>
+        <div class="nabras-en">NABRAS AI</div>
+        <p class="nabras-p" data-en="Nabras doesn't get programmed — it learns. Reads physical vibrations to predict failures weeks before they happen. Knows how you feel before you do.">نبراس لا يُبرمَج — يتعلم. يقرأ الذبذبات الفيزيائية للتنبؤ بالأعطال قبل أسابيع. يعرف كيف تشعر قبل أن تعرف أنت.</p>
+      </div>
+      <div class="nabras-list rv">
+        <div class="nb-item">
+          <div class="nb-dot"></div>
+          <div>
+            <div class="nb-tag" data-en="Predictive Diagnostics">تشخيص استباقي</div>
+            <div class="nb-desc" data-en="Vibration frequency analysis predicts component failures 2-3 weeks in advance. The car heals itself before it breaks.">تحليل ترددات الاهتزاز يتنبأ بأعطال القطع قبل 2-3 أسابيع. السيارة تصلح نفسها قبل أن تعطل.</div>
+          </div>
+        </div>
+        <div class="nb-item">
+          <div class="nb-dot"></div>
+          <div>
+            <div class="nb-tag" data-en="Matrix Laser · 600m">ليزر ماتريكس · 600 متر</div>
+            <div class="nb-desc" data-en="Laser matrix headlights with 600m range, pulsing ambient light reacting dynamically to acceleration and driving mode.">إضاءة ليزر ماتريكس بمدى 600 متر، إضاءة محيطية نبضية تتفاعل مع التسارع وأوضاع القيادة.</div>
+          </div>
+        </div>
+        <div class="nb-item">
+          <div class="nb-dot"></div>
+          <div>
+            <div class="nb-tag" data-en="Fiber Optics · Zero Wiring">ناقل ضوئي · صفر أسلاك</div>
+            <div class="nb-desc" data-en="Fiber optic architecture replaces traditional wiring harness — lighter, faster, immune to electromagnetic interference.">بنية ناقل ضوئي تحل محل الأسلاك التقليدية — أخف، أسرع، محصنة ضد التداخل الكهرومغناطيسي.</div>
+          </div>
+        </div>
+        <div class="nb-item">
+          <div class="nb-dot"></div>
+          <div>
+            <div class="nb-tag" data-en="Biometric Adaptation">تكيف بيومتري</div>
+            <div class="nb-desc" data-en="Reads heart rate, temperature, and stress levels. Adjusts climate, seat, and lighting automatically based on your state — not your command.">يقرأ معدل القلب ودرجة الحرارة ومستوى التوتر. يعدل التكييف والمقعد والإضاءة تلقائياً بناءً على حالتك — لا أمرك.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══ PROMPT GENERATOR ══ -->
+<section>
+  <div class="container">
+    <div class="rv">
+      <div class="s-num" data-en="05 · IMAGE GENERATOR">05 · مولد الصور</div>
+      <h2 class="s-title" data-en="AI Image Prompts">Prompts جاهزة لتوليد الصور</h2>
+      <div class="s-title-ar" data-en="Copy · Paste · Generate in Gemini / Midjourney / DALL-E">انسخ · الصق · ولّد في Gemini أو Midjourney</div>
+    </div>
+    <div class="prompt-tabs rv">
+      <div class="p-tab active" data-tab="exterior" tabindex="0" role="button" data-en="Exterior">الخارج</div>
+      <div class="p-tab" data-tab="interior" tabindex="0" role="button" data-en="Interior">الداخل</div>
+      <div class="p-tab" data-tab="night" tabindex="0" role="button" data-en="Night">ليلي</div>
+      <div class="p-tab" data-tab="studio" tabindex="0" role="button" data-en="Studio">ستوديو</div>
+      <div class="p-tab" data-tab="detail" tabindex="0" role="button" data-en="Details">تفاصيل</div>
+    </div>
+
+    <div class="prompt-panel active" id="tab-exterior">
+      <div class="pp-label" data-en="EXTERIOR · OUTDOOR SHOTS">الخارج · مشاهد خارجية</div>
+      <div class="shot-row"><div class="shot-label">Side</div><div class="shot-box"><div class="shot-prompt" id="pe1">Photorealistic CGI luxury hypercar ERTH 2026, perfect side profile, Monovolume single-volume body sculpted by airflow, extreme wheelbase-to-length ratio (3150mm / 4680mm), wheels pushed to corners, no grille opening, ultra-thin single LED strip flush in body, no door handles, camera mirrors, longtail fastback roofline, deep warm desert sand-gold metallic paint, turbine alloy wheels spinning blur, coastal highway golden hour, cinematic motion, 8K photorealistic</div><div class="shot-copy" tabindex="0" role="button" data-copy="pe1">نسخ</div></div></div>
+      <div class="shot-row"><div class="shot-label">Front</div><div class="shot-box"><div class="shot-prompt" id="pe2">Photorealistic CGI render ERTH hypercar concept, dynamic front three-quarter view, smooth continuous bonnet with no grille, single ultra-thin white LED light bar spanning full width embedded flush, variable aero inlets barely visible below LED, no visible headlight housing, seamless doors no handles, micro camera mirror pods, deep champagne-gold matte metallic, 21-inch turbine wheels, Riyadh skyline blurred background, blue-hour cinematic lighting, 8K ultra-detailed automotive photography</div><div class="shot-copy" tabindex="0" role="button" data-copy="pe2">نسخ</div></div></div>
+      <div class="shot-row"><div class="shot-label">Rear</div><div class="shot-box"><div class="shot-prompt" id="pe3">Photorealistic CGI ERTH hypercar concept rear three-quarter, extended longtail fastback flowing into clean tail, single ultra-thin full-width red LED strip flush with body, no spoiler no lip no plastic appendages, warm desert gold paint, turbine wheels motion blur, dramatic sunset light from behind, empty desert highway, perfect paint reflections, 8K cinematic automotive</div><div class="shot-copy" tabindex="0" role="button" data-copy="pe3">نسخ</div></div></div>
+      <div class="pp-note"><p><strong data-en="Tip:">نصيحة:</strong> <span data-en="Add at end: &quot;--ar 16:9 --style raw --v 6&quot; for Midjourney, or &quot;highly detailed, no watermark&quot; for Gemini">أضف في النهاية: <strong>"--ar 16:9 --style raw --v 6"</strong> لـ Midjourney، أو <strong>"highly detailed, no watermark"</strong> لـ Gemini</span></p></div>
+    </div>
+
+    <div class="prompt-panel" id="tab-interior">
+      <div class="pp-label" data-en="INTERIOR · CABIN SHOTS">الداخلية · المقصورة</div>
+      <div class="shot-row"><div class="shot-label">Driver</div><div class="shot-box"><div class="shot-prompt" id="pi1">Photorealistic CGI luxury hypercar interior ERTH 2026, driver POV, ultra-minimal visual silence philosophy, ultra-low dashboard natural walnut wood and plant fiber, no plastic visible, butterfly yoke steering wheel dark suede thin gold signature stitch, full windshield AR-HUD augmented reality speed navigation in subtle blue-white, no tablet screens, completely flat floor no transmission tunnel, warm champagne beige tones, invisible laminar AC slots along dashboard, hidden ambient gold lighting in door panels, 8K cinematic interior photography</div><div class="shot-copy" tabindex="0" role="button" data-copy="pi1">نسخ</div></div></div>
+      <div class="shot-row"><div class="shot-label">Cabin</div><div class="shot-box"><div class="shot-prompt" id="pi2">Photorealistic CGI ERTH hypercar wide interior view front and rear, Tardis effect cabin feels twice the exterior size, extreme rear legroom flat floor long wheelbase, natural wood trim thin gold embroidery line, transparent OLED rear window showing cinema mode, structural 7D sound integrated in doors and roof no visible speakers, warm beige natural fabric seats gold stitching, panoramic glass roof, hidden ambient lighting, 8K photorealistic automotive interior</div><div class="shot-copy" tabindex="0" role="button" data-copy="pi2">نسخ</div></div></div>
+      <div class="pp-note"><p><strong data-en="Tip:">نصيحة:</strong> <span data-en="Add: &quot;Rolls Royce meets Japanese wabi-sabi&quot; for perfect Visual Silence result">أضف: <strong>"Rolls Royce meets Japanese wabi-sabi"</strong> لنتيجة الهدوء البصري المثالي</span></p></div>
+    </div>
+
+    <div class="prompt-panel" id="tab-night">
+      <div class="pp-label" data-en="NIGHT SCENES">مشاهد ليلية</div>
+      <div class="shot-row"><div class="shot-label">City</div><div class="shot-box"><div class="shot-prompt" id="pn1">Photorealistic CGI ERTH hypercar night scene modern Gulf city, front three-quarter, ultra-thin LED front strip illuminated white light trail, Nabras AI pulsing amber ambient light on body panels reacting to acceleration, deep sand-gold paint reflecting Arabic neon signs and city towers, wet rain-soaked road perfect reflections, AR-HUD glowing through windshield, Riyadh or Dubai skyline background, dramatic cinematic night automotive photography, 8K</div><div class="shot-copy" tabindex="0" role="button" data-copy="pn1">نسخ</div></div></div>
+      <div class="shot-row"><div class="shot-label">Desert</div><div class="shot-box"><div class="shot-prompt" id="pn2">Photorealistic CGI ERTH hypercar isolated Arabian desert night, Milky Way sky, Nabras laser matrix headlights 600 meter beams piercing darkness illuminating desert road, thin gold LED front strip and red rear strip only light sources, deep champagne gold paint reflecting starlight and sand dunes, absolute stillness power at rest, cinematic wide angle National Geographic quality, 8K photorealistic</div><div class="shot-copy" tabindex="0" role="button" data-copy="pn2">نسخ</div></div></div>
+      <div class="pp-note"><p><strong data-en="Tip:">نصيحة:</strong> <span data-en="Add: &quot;long exposure photography effect&quot; for beautiful light trails from wheels">أضف: <strong>"long exposure photography effect"</strong> لخطوط ضوء جميلة من الإطارات</span></p></div>
+    </div>
+
+    <div class="prompt-panel" id="tab-studio">
+      <div class="pp-label" data-en="STUDIO RENDERS">ستوديو احترافي</div>
+      <div class="shot-row"><div class="shot-label">White</div><div class="shot-box"><div class="shot-prompt" id="ps1">Professional automotive studio CGI render ERTH hypercar 2026, pure white seamless studio background soft diffused lighting, perfect three-quarter front view, deep warm desert sand-gold metallic paint subtle pearl effect, ultra-smooth bodywork perfect panel gaps, seamless doors camera mirrors flush LED strip longtail profile turbine wheels, 8K ultra-detailed car configurator quality render, subtle ground reflection only</div><div class="shot-copy" tabindex="0" role="button" data-copy="ps1">نسخ</div></div></div>
+      <div class="shot-row"><div class="shot-label">Dark</div><div class="shot-box"><div class="shot-prompt" id="ps2">Luxury automotive CGI studio render ERTH hypercar, pure black background, single dramatic overhead light, obsidian black paint gold LED strips illuminated, ultra-high gloss perfect reflections, front three-quarter wheels slightly turned, spotlight roof and hood dramatic highlight strip, 8K photorealistic Genesis Rolls Royce press photo quality</div><div class="shot-copy" tabindex="0" role="button" data-copy="ps2">نسخ</div></div></div>
+      <div class="shot-row"><div class="shot-label">Heritage</div><div class="shot-box"><div class="shot-prompt" id="ps3">Photorealistic CGI ERTH hypercar parked before modern Islamic geometric architecture mashrabiya pattern facade, dawn golden hour light, deep sand-gold paint harmonizing with architectural stone, dramatic long shadow, atmosphere quiet luxury cultural heritage, architectural meets automotive photography, 8K photorealistic cinematic</div><div class="shot-copy" tabindex="0" role="button" data-copy="ps3">نسخ</div></div></div>
+      <div class="pp-note"><p><strong data-en="Color variants:">ألوان مقترحة:</strong> <span data-en="&quot;deep desert sand gold&quot; · &quot;obsidian black with gold accents&quot; · &quot;frozen white pearl&quot; · &quot;rub al-khali deep red&quot;">"deep desert sand gold" · "obsidian black with gold accents" · "frozen white pearl" · "rub al-khali deep red"</span></p></div>
+    </div>
+
+    <div class="prompt-panel" id="tab-detail">
+      <div class="pp-label" data-en="DETAIL SHOTS · MACRO">تفاصيل مقربة</div>
+      <div class="shot-row"><div class="shot-label">LED</div><div class="shot-box"><div class="shot-prompt" id="pd1">Extreme close-up macro CGI ERTH hypercar front LED strip, ultra-thin 3mm single light bar full vehicle width, flush seamless into body surface no protrusion, warm white 4200K, deep sand-gold metallic paint perfect reflection, water droplets, light appears from metal itself, cinematic bokeh background, 8K macro photography</div><div class="shot-copy" tabindex="0" role="button" data-copy="pd1">نسخ</div></div></div>
+      <div class="shot-row"><div class="shot-label">Wheel</div><div class="shot-box"><div class="shot-prompt" id="pd2">CGI close-up ERTH hypercar 21-inch turbine alloy wheel, five-spoke turbine design Star-Spoke variant, dark gunmetal polished edges, ultra-wide low-profile tire, red brake caliper, golden hour light dramatic spoke shadows, extreme detail machined aluminum surface, 8K automotive macro shallow depth of field</div><div class="shot-copy" tabindex="0" role="button" data-copy="pd2">نسخ</div></div></div>
+      <div class="pp-note"><p><strong data-en="Tip:">نصيحة:</strong> <span data-en="Add: &quot;product photography style, pure white background&quot; for clean brochure detail shots">أضف: <strong>"product photography style, pure white background"</strong> لتفاصيل بروشور نظيفة</span></p></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-in">
+      <div class="f-brand">أرث<span>ERTH Hypercar · 2026</span></div>
+      <div class="f-copy" data-en="Sovereign Hypercar · Technical Manifesto<br>Every Number Is A Promise<br>The Air Sculpted It · The Earth Embraced It">هايبركار سيادي · المانيفستو التقني<br>كل رقم هو وعد<br>الهواء نحتها · والأرض احتضنتها</div>
+      <div class="f-sig">BY SAIF AHMED<strong>ERTH-2026</strong></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── CURSOR ──
+const cur = document.getElementById('cur');
+const ring = document.getElementById('cur-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+});
+(function animateCursor(){
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animateCursor);
+})();
+
+document.querySelectorAll('.stat-box,.tech-box,.reality-card,.nb-item,.part-btn,.p-tab,.shot-copy').forEach(el => {
+  el.addEventListener('mouseenter', () => { ring.style.width = '44px'; ring.style.height = '44px'; });
+  el.addEventListener('mouseleave', () => { ring.style.width = '28px'; ring.style.height = '28px'; });
+});
+
+// ── REVEAL ──
+const obs = new IntersectionObserver(entries => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('on'), i * 55);
+      obs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.rv').forEach(el => obs.observe(el));
+
+// ── SOUND ENGINE (Fixed & Layered) ──
+class SoundEngine {
+  constructor() {
+    this.ctx = null;
+    this.layers = {};
+    this.isInit = false;
+  }
+  init() {
+    if (this.isInit) return;
+    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    this.isInit = true;
+    this.setupLayers();
+  }
+  setupLayers() {
+    this.layers.idle = this._createOsc(45, 'sine', 0.04);
+    this.layers.turbine = this._createOsc(120, 'triangle', 0.0);
+    this.layers.harmonics = this.ctx.createBiquadFilter();
+    this.layers.harmonics.type = 'bandpass';
+    this.layers.harmonics.frequency.value = 800;
+    this.layers.harmonics.Q.value = 1.2;
+    this.layers.turbine.osc.connect(this.layers.harmonics);
+    this.layers.harmonics.connect(this.ctx.destination);
+    this.layers.idle.osc.start();
+    this.layers.turbine.osc.start();
+  }
+  _createOsc(freq, type, gain) {
+    const osc = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    osc.type = type; osc.frequency.value = freq;
+    g.gain.value = gain;
+    osc.connect(g); g.connect(this.ctx.destination);
+    return { osc, gain: g };
+  }
+  setState(state) {
+    if (!this.isInit) return;
+    const now = this.ctx.currentTime;
+    const set = (node, val, t = 0.2) => node.gain.gain.setTargetAtTime(val, now, t);
+    const freq = (node, val, t = 0.2) => node.osc.frequency.setTargetAtTime(val, now, t);
+    switch(state) {
+      case 'idle': set(this.layers.idle, 0.04); set(this.layers.turbine, 0.0); break;
+      case 'core': set(this.layers.idle, 0.06, 0.3); set(this.layers.turbine, 0.08, 0.4); freq(this.layers.turbine, 220, 0.4); break;
+      case 'detail': set(this.layers.idle, 0.03, 0.1); set(this.layers.turbine, 0.14, 0.2); freq(this.layers.turbine, 480, 0.2); break;
+      case 'stealth': set(this.layers.idle, 0.01); set(this.layers.turbine, 0.0); break;
+    }
+  }
+}
+const audio = new SoundEngine();
+
+// ── HAPTIC FEEDBACK ──
+function haptic() {
+  audio.init();
+  const osc = audio.ctx.createOscillator();
+  const gain = audio.ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(150, audio.ctx.currentTime);
+  gain.gain.setValueAtTime(0.08, audio.ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, audio.ctx.currentTime + 0.2);
+  osc.connect(gain); gain.connect(audio.ctx.destination);
+  osc.start(); osc.stop(audio.ctx.currentTime + 0.2);
+  document.getElementById('v-engine').style.transform = 'scale(0.99)';
+  setTimeout(() => { document.getElementById('v-engine').style.transform = 'scale(1)'; }, 100);
+}
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── LANGUAGE ──
+let curL = 'ar';
+function toggleLang() {
+  haptic();
+  audio.setState(curL === 'ar' ? 'detail' : 'core');
+  curL = curL === 'ar' ? 'en' : 'ar';
+  document.documentElement.dir = curL === 'ar' ? 'rtl' : 'ltr';
+  document.getElementById('l-ar').style.opacity = curL === 'ar' ? 1 : 0;
+  document.getElementById('l-en').style.opacity = curL === 'en' ? 1 : 0;
+  document.querySelectorAll('[data-en]').forEach(el => {
+    const tmp = el.innerHTML;
+    el.innerHTML = el.getAttribute('data-en');
+    el.setAttribute('data-en', tmp);
+  });
+}
+
+// ── DISSECTION ──
+let curLayer = 'shell';
+const textBank = {
+  ar: {
+    shell: { t: 'المنطق السيادي', p: '"أرث" هي بيان لنقاء الهندسة. كل طبقة تمثل علامة فارقة في السفر عالي السرعة. انقر على الهيكل لبدء التفكيك.' },
+    core: { t: 'القلب التقني', p: 'تم إزالة الهيكل الخارجي من Graphene-Carbon Monocoque. اختر قلب التوربين أو مصفوفة طاقة الغرافين.' },
+    turbine: { t: 'توربين Inconel 718', p: 'محرك نفاث مصغر يدور بـ 100,000 دورة في الدقيقة. مصنوع من Inconel 718 — نفس سبيكة محركات الطائرات. يعمل فقط كمولد طاقة، لا يلمس العجلات أبداً. 3 قطع متحركة فقط.' },
+    caps: { t: 'مصفوفة طاقة الغرافين', p: 'مكثفات غرافين فائقة تفرغ طاقتها في أجزاء من الثانية — 900 حصان لحظي. مليون دورة عمر افتراضي. لا تدهور كيميائي، لا استبدال، أداء ثابت من −40° حتى +85°.' }
+  },
+  en: {
+    shell: { t: 'Sovereign Logic', p: 'ERTH is a statement of engineering purity. Every layer is a milestone in high-speed travel. Click the chassis to begin dissection.' },
+    core: { t: 'Technical Core', p: 'Graphene-Carbon Monocoque exterior removed. Select the Inconel 718 Turbine Core or the Graphene Energy Matrix.' },
+    turbine: { t: 'Inconel 718 Turbine', p: 'Micro-turbine spinning at 100,000 RPM, built from Inconel 718 — the exact alloy in jet engines. Acts purely as a generator. Never drives the wheels. Only 3 moving parts.' },
+    caps: { t: 'Graphene Energy Matrix', p: 'Graphene supercapacitors discharge in milliseconds — 900 instant horsepower. 1 million cycle lifespan. No chemical degradation. Stable performance from −40° to +85°C.' }
+  }
+};
+function updateInfo() {
+  const n = textBank[curL][curLayer];
+  document.getElementById('info-t').innerText = n.t;
+  document.getElementById('info-p').innerText = n.p;
+}
+
+// ── IMAGE LOADING ──
+const images = {
+  shell: './assets/shell.jpg',
+  core: './assets/core.jpg',
+  turbine: './assets/turbine.jpg',
+  caps: './assets/caps.jpg'
+};
+const engine = document.getElementById('v-engine');
+const overlay = document.getElementById('ui-overlay');
+const hint = document.getElementById('hint');
+const btnBack = document.getElementById('btn-back');
+const btnReset = document.getElementById('btn-reset');
+const loader = document.getElementById('loader');
+
+function loadImg(src, cb) {
+  console.log('📥 Loading:', src);
+  loader.classList.add('active');
+  const img = new Image();
+  img.onload = () => {
+    console.log('✅ Loaded:', src);
+    engine.style.backgroundImage = `url('${src}')`;
+    loader.classList.remove('active');
+    if (cb) cb();
+  };
+  img.onerror = () => {
+    console.error('❌ Failed:', src);
+    loader.classList.remove('active');
+    showToast('فشل تحميل الصورة — تحقق من المسار');
+  };
+  img.src = src;
+}
+
+function startDissection() {
+  if (curLayer === 'shell') {
+    haptic(); audio.setState('core');
+    curLayer = 'core';
+    loadImg(images.core, () => {
+      overlay.classList.add('active');
+      hint.style.display = 'none';
+      btnReset.style.display = 'block';
+      updateInfo();
+    });
+  }
+}
+function drillTo(part, e) {
+  if (e) e.stopPropagation();
+  haptic(); audio.setState('detail');
+  curLayer = part;
+  overlay.classList.remove('active');
+  loadImg(images[part]);
+  btnBack.style.display = 'block';
+  updateInfo();
+}
+function goBack(e) {
+  if (e) e.stopPropagation();
+  haptic(); audio.setState('core');
+  curLayer = 'core';
+  loadImg(images.core, () => {
+    overlay.classList.add('active');
+    btnBack.style.display = 'none';
+    updateInfo();
+  });
+}
+function resetAll(e) {
+  if (e) e.stopPropagation();
+  haptic(); audio.setState('idle');
+  curLayer = 'shell';
+  loadImg(images.shell, () => {
+    overlay.classList.remove('active');
+    btnReset.style.display = 'none';
+    btnBack.style.display = 'none';
+    hint.style.display = 'block';
+    updateInfo();
+  });
+}
+
+// ── TABS ──
+function switchTab(tabId) {
+  document.querySelectorAll('.p-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.prompt-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+  document.getElementById(`tab-${tabId}`).classList.add('active');
+}
+
+// ── COPY ──
+function doCopy(id, btn) {
+  const text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(curL === 'ar' ? 'تم النسخ' : 'COPIED');
+    const orig = btn.innerText;
+    btn.innerText = '✓';
+    setTimeout(() => btn.innerText = orig, 2000);
+  });
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🚀 ERTH App Initialized');
+  
+  // Language toggle
+  document.getElementById('langToggle').addEventListener('click', toggleLang);
+  
+  // Dissection interactions
+  engine.addEventListener('click', startDissection);
+  document.querySelectorAll('.part-btn').forEach(btn => {
+    btn.addEventListener('click', e => drillTo(btn.dataset.part, e));
+  });
+  btnBack.addEventListener('click', goBack);
+  btnReset.addEventListener('click', resetAll);
+  
+  // Tabs
+  document.querySelectorAll('.p-tab').forEach(tab => {
+    tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+  });
+  
+  // Copy buttons
+  document.querySelectorAll('.shot-copy').forEach(btn => {
+    btn.addEventListener('click', () => doCopy(btn.dataset.copy, btn));
+  });
+  
+  // Keyboard support
+  document.querySelectorAll('[tabindex="0"]').forEach(el => {
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        el.click();
+      }
+    });
+  });
+});
+</script>
 </body>
 </html>
